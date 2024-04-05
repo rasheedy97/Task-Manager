@@ -23,7 +23,7 @@ class TaskSeeder extends Seeder
                 'due_date' => null,
             ]);
 
-            $fiveTasks = $parentTasks->slice(-5);
+        $fiveTasks = $parentTasks->slice(-5);
         foreach ($fiveTasks as $parentTask) {
             $parentTask->children()->saveMany(
                 Task::factory()
