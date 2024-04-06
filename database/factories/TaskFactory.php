@@ -23,7 +23,7 @@ class TaskFactory extends Factory
             'title' => $this->faker->sentence,
             'status_id' => 1,
             'due_date' => null,
-            'parent_id' => null,
+            
         ];
     }
 }

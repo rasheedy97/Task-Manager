@@ -18,10 +18,8 @@ return new class extends Migration
             $table->unsignedBigInteger('assignee_id')->nullable();
             $table->dateTime('due_date')->nullable();
             $table->unsignedBigInteger('status_id')->default(1)->nullable();
-            $table->unsignedBigInteger('parent_id')->nullable();
             $table->foreign('assignee_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('status_id')->references('id')->on('statuses')->onDelete('set null');
-            $table->foreign('parent_id')->references('id')->on('tasks')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -11,20 +11,22 @@ class Task extends Model
 
     protected $fillable = ['title', 'description', 'assignee_id', 'due_date', 'parent_id','status_id'];
 
+
     public function assignee()
     {
         return $this->belongsTo(User::class, 'assignee_id');
     }
 
-    public function parent()
+    public function dependencies()
     {
-        return $this->belongsTo(Task::class, 'parent_id');
+        return $this->belongsToMany(Task::class, 'task_dependencies', 'task_id', 'dependency_id');
     }
 
-    public function children()
+    public function dependents()
     {
-        return $this->hasMany(Task::class, 'parent_id');
+        return $this->belongsToMany(Task::class, 'task_dependencies', 'dependency_id', 'task_id');
     }
+
 
     public function status()
     {

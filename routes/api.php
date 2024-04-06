@@ -27,7 +27,11 @@ Route::post('login',[AuthController::class,'login']);
 Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('logout',[AuthController::class,'logout']);
+
+    //Tasks
     Route::resource('tasks',TaskController::class);
+    Route::post('tasks/add-dependency',[TaskController::class,'addDependency']);
+
 
 });
 

@@ -3,7 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\Task;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Arr;
 
 class TaskSeeder extends Seeder
 {
@@ -14,25 +16,23 @@ class TaskSeeder extends Seeder
      */
     public function run()
     {
+        $userIds = range(4, 10);
+
+         Task::factory()
+        ->count(10)
+        ->make([
+            'status_id' => 1,
+        ])
+        ->each(function ($task) use ($userIds) {
+            $task->assignee_id = Arr::random($userIds);
+            $task->due_date = Carbon::now()->addDays(rand(1, 90))->startOfDay();
+            $task->save();
+        });
 
 
-        $parentTasks = Task::factory()
-            ->count(10)
-            ->create([
-                'status_id' => 1,
-                'due_date' => null,
-            ]);
 
-        $fiveTasks = $parentTasks->slice(-5);
-        foreach ($fiveTasks as $parentTask) {
-            $parentTask->children()->saveMany(
-                Task::factory()
-                    ->count(3)
-                    ->make([
-                        'status_id' => 1,
-                        'due_date' => null,
-                    ])
-            );
-        }
     }
+
+
+
 }

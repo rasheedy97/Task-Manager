@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class TaskRequest extends FormRequest
+class UpdateTaskRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,7 @@ class TaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "title" => "required|string|max:50",
+            "title" => "string|max:50",
             "description" => "string|max:255",
             "due_date" => "date",
             "assignee_id" => "numeric|exists:users,id",
