@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Http\Requests\TaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Task;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -36,7 +37,7 @@ class TaskService
             $query->where('assignee_id', $user->id);
         });
 
-        return $query->get();
+        return $query->with('dependencies')->get();
     }
 
 
@@ -64,24 +65,55 @@ class TaskService
         return 'Task created successfully';
     }
 
-    public function updateTask($request,$task){
+    public function updateTask(UpdateTaskRequest $request, Task $task)
+    {
         $user = Auth::user();
-        $validatedData = $request->validated();
-        if ($user->hasRole('User') && $task->assignee_id !== $user->id) {
-            throw new \Exception('Unauthorized to update task status');
+//return $request->input('status_id');
+
+        if ($user->hasRole('Manager')) {
+           return $this->updateTaskForManager($request, $task);
+        } else {
+         return   $this->updateTaskForUser($request, $task, $user);
         }
 
-        if ($request->has('status') && $request->status_id === 2 && $task->dependencies()->exists()) {
+    }
 
-            $incompleteDependencies = $task->dependencies()->where('status_id', '!=', 2)->exists();
-            if ($incompleteDependencies) {
 
-                throw new \Exception('Cannot complete task. Dependencies are not completed.');
+    protected function updateTaskForManager(UpdateTaskRequest $request, Task $task)
+    {
+        $task->update([
+            'title' => $request->input('title'),
+            'description' => $request->input('description'),
+            'assignee_id' => $request->input('assignee_id'),
+            'due_date' => $request->input('due_date'),
+            'status_id' => $request->input('status_id'),
+        ]);
+        return 'Task Updated Successfully';
+    }
+
+    protected function updateTaskForUser(UpdateTaskRequest $request, Task $task, $user)
+    {
+
+
+        if ($task->assignee_id === $user->id) {
+
+            if ($request->status_id == 2) {
+
+                $dependencies = $task->dependencies;
+                foreach ($dependencies as $dependency) {
+                    if ($dependency->status_id !== 2) {
+                        throw new \Exception('Cannot complete task until all dependencies are completed');
+                    }
+                }
             }
-        }
 
-        $task->update($validatedData);
-        return 'Task Updated';
+            $task->update([
+                'status_id' => $request->status_id,
+            ]);
+        } else {
+            throw new \Exception('You are not authorized to update this task');
+        }
+    return 'Task updated successfuly';
     }
 
     public function addDependency($taskId,$dependencyId){

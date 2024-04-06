@@ -69,7 +69,8 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, Task $task)
     {
-       $response = $this->taskService->updateTask($request,$task);
+
+        $response = $this->taskService->updateTask($request,$task);
        return response()->json(["message" => $response], 200);
 
 
