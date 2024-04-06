@@ -13,6 +13,7 @@ class TaskService
     public function getAllTasks($request)
     {
 
+        //return $request;
         $user = Auth::user();
         $query = Task::query();
 
@@ -23,13 +24,14 @@ class TaskService
             $query->whereBetween('due_date', [$dueDateStart, $dueDateEnd]);
         }
 
-        $query->when($request->filled('status'), function ($query) use ($request) {
+        $query->when($request->filled('status_id'), function ($query) use ($request) {
 
-            $query->where('status_id', $request->input('status'));
+            $query->whereIn('status_id', $request->input('status_id'));
+
         });
 
         $query->when($request->filled('assignee_id') && $user->hasRole('Manager'), function ($query) use ($request) {
-            $query->where('assignee_id', $request->input('assignee_id'));
+            $query->whereIn('assignee_id', (array)$request->input('assignee_id'));
         });
 
         $query->when($user->hasRole('User'), function ($query) use ($user) {
