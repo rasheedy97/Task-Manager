@@ -103,7 +103,7 @@ class TaskService
 
                 $dependencies = $task->dependencies;
                 foreach ($dependencies as $dependency) {
-                    if ($dependency->status_id !== 2) {
+                    if ($dependency->status_id === 1) {
                         throw new \Exception('Cannot complete task until all dependencies are completed');
                     }
                 }
