@@ -47,7 +47,7 @@ class TaskService
 
         if ($user->hasRole('User')) {
             if ($task->assignee_id !== $user->id) {
-                throw new \Exception('Unauthorized to update task status');
+                throw new \Exception('Unauthorized to view task');
 
             }
         }
