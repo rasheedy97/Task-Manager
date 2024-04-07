@@ -13,7 +13,7 @@ class TaskService
     public function getAllTasks($request)
     {
 
-        //return $request;
+
         $user = Auth::user();
         $query = Task::query();
 
@@ -26,7 +26,7 @@ class TaskService
 
         $query->when($request->filled('status_id'), function ($query) use ($request) {
 
-            $query->whereIn('status_id', $request->input('status_id'));
+            $query->whereIn('status_id', (array)$request->input('status_id'));
 
         });
 
@@ -39,7 +39,7 @@ class TaskService
             $query->where('assignee_id', $user->id);
         });
 
-        return $query->with('dependencies')->get();
+        return $query->get();
     }
 
 
@@ -49,12 +49,9 @@ class TaskService
 
         if ($user->hasRole('User')) {
             if ($task->assignee_id !== $user->id) {
-                throw new \Exception('Unauthorized to view task');
-
+                throw new \Exception('Unauthorized to view task',401);
             }
         }
-
-        $task->load('dependencies');
         return $task;
     }
 
@@ -69,13 +66,13 @@ class TaskService
 
     public function updateTask(UpdateTaskRequest $request, Task $task)
     {
-        $user = Auth::user();
+
 //return $request->input('status_id');
 
-        if ($user->hasRole('Manager')) {
+        if (Auth::user()->hasRole('Manager')) {
            return $this->updateTaskForManager($request, $task);
         } else {
-         return   $this->updateTaskForUser($request, $task, $user);
+         return   $this->updateTaskForUser($request, $task);
         }
 
     }
@@ -83,19 +80,14 @@ class TaskService
 
     protected function updateTaskForManager(UpdateTaskRequest $request, Task $task)
     {
-        $task->update([
-            'title' => $request->input('title'),
-            'description' => $request->input('description'),
-            'assignee_id' => $request->input('assignee_id'),
-            'due_date' => $request->input('due_date'),
-            'status_id' => $request->input('status_id'),
-        ]);
+        $user = Auth::user();
+        $task->update($request->validated());
         return 'Task Updated Successfully';
     }
 
-    protected function updateTaskForUser(UpdateTaskRequest $request, Task $task, $user)
+    protected function updateTaskForUser(UpdateTaskRequest $request, Task $task)
     {
-
+        $user = Auth::user();
 
         if ($task->assignee_id === $user->id) {
 
@@ -104,7 +96,7 @@ class TaskService
                 $dependencies = $task->dependencies;
                 foreach ($dependencies as $dependency) {
                     if ($dependency->status_id === 1) {
-                        throw new \Exception('Cannot complete task until all dependencies are completed');
+                        throw new \Exception('Cannot complete task until all dependencies are completed',400);
                     }
                 }
             }
@@ -113,9 +105,10 @@ class TaskService
                 'status_id' => $request->status_id,
             ]);
         } else {
-            throw new \Exception('You are not authorized to update this task');
+            throw new \Exception('You are not authorized to update this task',401);
         }
-    return 'Task updated successfuly';
+        return 'Task updated successfuly';
+
     }
 
     public function addDependency($taskId,$dependencyId){

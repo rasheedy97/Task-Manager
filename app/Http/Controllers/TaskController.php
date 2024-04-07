@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\DependencyRequest;
 use App\Http\Requests\TaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
+use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use App\Services\TaskService;
+use Exception;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -16,7 +18,7 @@ class TaskController extends Controller
     {
 
         $this->taskService = $taskService;
-        $this->middleware('role:Manager')->only(['store', 'destroy','addDependency']);
+        $this->middleware('role:Manager')->only(['store', 'destroy', 'addDependency']);
     }
 
     /**
@@ -26,7 +28,7 @@ class TaskController extends Controller
     {
 
         $tasks = $this->taskService->getAllTasks($request);
-        return response()->json($tasks);
+        return response()->json(TaskResource::collection($tasks));
     }
 
     /**
@@ -52,8 +54,13 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        $task = $this->taskService->getTask($task);
-        return response()->json(["Task" => $task], 200);
+        try {
+
+            $task = $this->taskService->getTask($task);
+        } catch (Exception $e) {
+            return response()->json(["message" => $e->getMessage()], 200);
+        }
+        return response()->json(["Task" => new TaskResource($task)], 200);
     }
 
     /**
@@ -69,12 +76,13 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, Task $task)
     {
+        try {
 
-        $response = $this->taskService->updateTask($request,$task);
-       return response()->json(["message" => $response], 200);
-
-
-
+            $response = $this->taskService->updateTask($request, $task);
+        } catch (Exception $e) {
+            return response()->json(["message" => $e->getMessage()], 400);
+        }
+        return response()->json(["message" => $response], 200);
     }
 
     /**
@@ -83,10 +91,8 @@ class TaskController extends Controller
     public function addDependency(DependencyRequest $request)
     {
 
-        $response = $this->taskService->addDependency($request->task_id,$request->dependency_id);
+        $response = $this->taskService->addDependency($request->task_id, $request->dependency_id);
         return response()->json(["message" => $response], 200);
-
-
     }
 
 
