@@ -10,7 +10,6 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libonig-dev \
     zip \
-    jpegoptim optipng pngquant gifsicle \
     vim \
     unzip \
     git \
@@ -32,12 +31,11 @@ RUN mkdir /app
 WORKDIR /app
 COPY . .
 
-RUN cd Task-Manager
 RUN composer install
 RUN cd /app
 RUN cp .env.example .env
 RUN php artisan key:generate
-RUN php artisan migrate —seed
+RUN php artisan migrate --seed
 
 
 EXPOSE 8000

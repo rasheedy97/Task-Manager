@@ -29,9 +29,11 @@ This is a brief guide on how to run the Task Manager application.
     php artisan key:generate
     ```
 
+    # TODO RUN XXAMP
+
 5. **Migrate and Seed the Database**
     ```
-    php artisan migrate —seed
+    php artisan migrate --seed
     ```
     This will create 10 users, 3 of which are managers and 7 are users. The users are:
     - manager[1,2,3]@example.com Passwords: password123
