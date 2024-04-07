@@ -34,7 +34,7 @@ This is a brief guide on how to run the Task Manager application.
     php artisan migrate —seed
     ```
     This will create 10 users, 3 of which are managers and 7 are users. The users are:
-    - manager[1,2,3]@example.com password123
+    - manager[1,2,3]@example.com Passwords: password123
     - user[4,5,6,7,8,9]@example.com Passwords: password123
      
 
