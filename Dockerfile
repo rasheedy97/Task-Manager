@@ -35,7 +35,6 @@ RUN composer install
 RUN cd /app
 RUN cp .env.example .env
 RUN php artisan key:generate
-RUN php artisan migrate --seed
 
 
 EXPOSE 8000

@@ -1,0 +1,29 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+    - ./.env_example
+    depends_on:
+      - db
+    command: >
+      bash -c "php artisan migrate --seed && php artisan serve"
+  db:
+    image: mysql:8.2.12
+    restart: always
+    environment:
+      MYSQL_DATABASE: tasks
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ""
+    volumes:
+      - mysqldata:/var/lib/mysql
+    ports:
+      - "33060:3306"
+volumes:
+  mysqldata:
