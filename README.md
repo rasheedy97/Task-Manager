@@ -31,7 +31,7 @@ This is a brief guide on how to run the Task Manager application.
 
 5. **Migrate and Seed the Database**
     ```
-    php artisan migrate —seed
+    php artisan migrate --seed
     ```
     (Run xampp for db connection)
     
