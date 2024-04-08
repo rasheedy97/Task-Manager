@@ -19,19 +19,19 @@ class TaskService
 
         if ($request->filled(['due_start_day', 'due_end_day'])) {
 
-            $dueDateStart = Carbon::parse($request->input('due_start_day'))->startOfDay();
-            $dueDateEnd = Carbon::parse($request->input('due_end_day'))->endOfDay();
+            $dueDateStart = Carbon::parse($request->due_start_day)->startOfDay();
+            $dueDateEnd = Carbon::parse($request->due_end_day)->endOfDay();
             $query->whereBetween('due_date', [$dueDateStart, $dueDateEnd]);
         }
 
         $query->when($request->filled('status_id'), function ($query) use ($request) {
 
-            $query->whereIn('status_id', (array)$request->input('status_id'));
+            $query->whereIn('status_id', (array)$request->status_id);
 
         });
 
         $query->when($request->filled('assignee_id') && $user->hasRole('Manager'), function ($query) use ($request) {
-            $query->whereIn('assignee_id', (array)$request->input('assignee_id'));
+            $query->whereIn('assignee_id', (array)$request->assignee_id);
         });
 
         $query->when($user->hasRole('User'), function ($query) use ($user) {
